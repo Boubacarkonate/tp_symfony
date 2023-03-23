@@ -24,6 +24,9 @@ class Produit
     #[ORM\OneToMany(mappedBy: 'produit', targetEntity: Commentaire::class)]
     private Collection $commentaires;
 
+    #[ORM\Column(length: 255)]
+    private ?string $image = null;
+
     public function __construct()
     {
         $this->commentaires = new ArrayCollection();
@@ -88,8 +91,20 @@ class Produit
         return $this;
     }
     
-    // public function __toString()
-    // {
-    //     return $this->titre;                                //clef etrangere reliéé dans la table commentaire
-    // }
+     public function __toString()
+    {
+         return $this->titre;                                //clef etrangere reliéé dans la table commentaire
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(string $image): self
+    {
+        $this->image = $image;
+
+        return $this;
+    }
 }

@@ -3,9 +3,9 @@
 {% block title %}Produit index{% endblock %}
 
 {% block body %}
-    <h1>Produit index</h1>
-    
- <div class="row row-cols-1 row-cols-md-3 g-4">
+   <h1>Produit index</h1>
+
+   <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for produit in produits %}
 
          <div class="col">
@@ -24,9 +24,4 @@
 
     <a href="{{ path('app_produit_new') }}">Create new</a>
 
-
-
-    
 {% endblock %}
-
-
