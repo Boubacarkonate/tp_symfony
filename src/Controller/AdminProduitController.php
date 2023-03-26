@@ -39,9 +39,6 @@ class AdminProduitController extends AbstractController
                 $produit->setImage($imageproduit_nom);
             }
 
-
-
-        
             $produitRepository->save($produit, true);
 
             return $this->redirectToRoute('app_admin_produit_index', [], Response::HTTP_SEE_OTHER);
