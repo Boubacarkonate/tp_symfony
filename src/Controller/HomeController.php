@@ -7,11 +7,12 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(MailerInterface $mailer): Response
+    public function index(MailerInterface $mailer, RequestStack $requesStack): Response
     {
         $email = (new Email())
         ->from('hello@example.com')
@@ -27,6 +28,12 @@ class HomeController extends AbstractController
 
         $mailer->send($email);
 
+        $tab_identite=[
+            "nom"=>"Black",
+            'prenom'=>"Joe"
+        ];
+
+        $requesStack->getSession()->set("identite", $tab_identite);
 
         return $this->render('home/index.html.twig', [
             'controller_name' => 'HomeController',

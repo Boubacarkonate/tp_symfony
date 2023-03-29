@@ -7,12 +7,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RequestStack;
 
 class JeuController extends AbstractController
 {
     
     #[Route('/jeu', name: 'app_jeu')]
-    public function index(Request $request): Response
+    public function index(Request $request, RequestStack $requesStack): Response
     {
         $form = $this->createForm(JeuType::class);
 
@@ -39,6 +40,8 @@ class JeuController extends AbstractController
                   
 
     }
+
+   dd($requesStack->getSession()->get("identite")) ;
 
             return $this->renderForm('jeu/index.html.twig', [
             'jeu' => $form

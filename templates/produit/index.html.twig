@@ -13,8 +13,10 @@
             <img src="{{ asset('img/') ~ produit.image}}" class="card-img-top" alt="...">
             <div class="card-body">
                 <h5 class="card-title">{{ produit.titre }}</h5>
-                <p class="card-text">{{ produit.description }}.</p>
+                <p class="card-text">{{ produit.description }}</p>
+                {# <a href="{{ path('app_cart_add', {'id': produit.id}) }}" class="btn btn-primary">ajout panier</a> #}
                 <a href="{{ path('app_produit_show', {'id': produit.id}) }}" class="btn btn-primary">détail</a>
+               
             </div>
             </div>
          </div>   
