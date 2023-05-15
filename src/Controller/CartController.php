@@ -2,102 +2,108 @@
 
 namespace App\Controller;
 
-use App\Entity\Produit;
-use App\Repository\ProduitRepository;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\RequestStack;
+use App\Entity\Forfait;
+use App\Service\CartService;
+use App\Repository\ForfaitRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 
- #[Route('/cart')]
+
+/*
+
+Clé = Valeur
+[clé] = valeur
+
+[
+    [clé]=>[valeur]
+]
+/cart/add/7
+/cart/add/8
+/cart/add/8
+
+
+    [7]=>1
+    [8]=>2
+
+
+
+
+*/
+
+#[Route('/cart')]
 class CartController extends AbstractController
 {
-   
-    
-
-    // #[Route('/add/{id}', name: 'app_cart_add')]
-    // public function index(Produit $produit, RequestStack $session): Response
-    // {
-
-    //    dd($session->getSession()->set("panier",[]));
-
-    //     return $this->render('cart/index.html.twig', [
-    //         'controller_name' => 'CartController',
-    //     ]);
-    // }
-
-    // #[Route('/show', name: 'app_cart_show')]
-    // public function show(RequestStack $session): Response
-    // {
-    //     dd($session->getSession()->get("panier",[]));
-
-    //     return $this->render('cart/index.html.twig', [
-    //         'controller_name' => 'CartController',
-    //     ]);
-    // }
-
+    // page d'ajout de forfait
     #[Route('/add/{id}', name: 'app_cart_add')]
-    public function index(RequestStack $session, $id): Response         //j'ai enlevé le Produit $produit car je n'ai pas besoin du param convert
-    {
+    public function index
+    ($id,
+    CartService $cartService
+    ):  Response
+    {      
+        $cartService->add($id);
+        // redirection vers la page des forfaits
+         return $this->redirectToRoute("app_cart_show",[], Response::HTTP_SEE_OTHER);
 
-      $panier = $session->getSession()->get("panier",[]);
-
-      if (empty($panier[$id])) {
-        $panier[$id]=0;
-      }
-
-       $panier[$id]++ ;
-
-      $session->getSession()->set("panier", $panier) ;
-       //dd($panier);
-
-        return $this->redirectToRoute("app_produit_index",[], Response::HTTP_SEE_OTHER);         //redirection vers la page des produits
-       
     }
 
-
-
+    // page pour visualiser notre panier
     #[Route('/show', name: 'app_cart_show')]
-    public function show(ProduitRepository $produitRepository, RequestStack $session): Response
+    public function show(
+      CartService $cartService
+        ): Response
     {
-        // $session->getSession()->get("panier",[]);
-       $panier = $session->getSession()->get("panier");
-
-        $panier_complet=[];
-
-
-
-
-
-        $total=0;
-                                //key                  value
-        foreach ($panier as $produit_selectionne => $quantite) {
-            $selection_achat = $produitRepository->find($produit_selectionne);
-
-
-            $panier_complet[]=[
-                'produit' => $produitRepository->find($produit_selectionne),
-                'quantite'=>$quantite,
-                'total' => ($selection_achat->getPrix()*$quantite),
-            ];
-
-            $total = $total + ($selection_achat->getPrix()*$quantite);
-        }
-
+        
         return $this->render('cart/index.html.twig', [
-            'panier' => $panier_complet,
+            'panier' => $cartService->show(),
+            'totalcomplet'=> $cartService->getTotalAll()
         ]);
     }
 
-
+    // page pour vider notre panier
     #[Route('/clear', name: 'app_cart_clear')]
-    public function clear(RequestStack $session) : Response
+    public function clear(
+        CartService $cartService
+    ): Response
     {
-        dd($session->getSession()->remove("panier",[]));
+        $cartService->clear();
+        
+        // redirection vers la page des forfaits
+        return $this->redirectToRoute("app_forfait_index",[], Response::HTTP_SEE_OTHER);
 
-        return $this->render('cart/index.html.twig', [
-            'controller_name' => 'CartController',
-        ]);
     }
+
+       // page pour vider notre panier
+       #[Route('/remove/{id}', name: 'app_cart_remove')]
+       public function remove_all(
+            $id,
+           CartService $cartService
+       ): Response
+       {
+            // supprimer la clé du tableau (le forfait)
+           $cartService->remove_all($id);
+           
+           // redirection vers la page des forfaits
+           return $this->redirectToRoute("app_cart_show",[], Response::HTTP_SEE_OTHER);
+   
+       }
+
+
+// page pour vider notre panier
+#[Route('/removequantite/{id}', name: 'app_cart_removequantite')]
+public function removequantite(
+     $id,
+    CartService $cartService
+): Response
+{
+     // supprimer la clé du tableau (le forfait)
+    $cartService->remove($id);
+    
+    // redirection vers la page des forfaits
+    return $this->redirectToRoute("app_cart_show",[], Response::HTTP_SEE_OTHER);
+
+}
+
 }

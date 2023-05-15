@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Entity;
-
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -39,19 +38,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Commentaire::class)]
-    private Collection $commentaires;
+    #[ORM\Column(type: 'datetime_immutable', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(type: 'boolean')]
-    private $isVerified = false;
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Forfait $forfait = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $nom = null;
+    #[ORM\OneToMany(mappedBy: 'users', targetEntity: Facture::class)]
+    private Collection $factures;
 
     public function __construct()
     {
-        $this->commentaires = new ArrayCollection();
+        $this->factures = new ArrayCollection();
     }
+
+
 
     public function getId(): ?int
     {
@@ -142,59 +143,62 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    /**
-     * @return Collection<int, Commentaire>
-     */
-    public function getCommentaires(): Collection
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
-        return $this->commentaires;
+        return $this->createdAt;
     }
 
-    public function addCommentaire(Commentaire $commentaire): self
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
     {
-        if (!$this->commentaires->contains($commentaire)) {
-            $this->commentaires->add($commentaire);
-            $commentaire->setUser($this);
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getForfait(): ?Forfait
+    {
+        return $this->forfait;
+    }
+
+    public function setForfait(?Forfait $forfait): self
+    {
+        $this->forfait = $forfait;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Facture>
+     */
+    public function getFactures(): Collection
+    {
+        return $this->factures;
+    }
+
+    public function addFacture(Facture $facture): self
+    {
+        if (!$this->factures->contains($facture)) {
+            $this->factures->add($facture);
+            $facture->setUsers($this);
         }
 
         return $this;
     }
 
-    public function removeCommentaire(Commentaire $commentaire): self
+    public function removeFacture(Facture $facture): self
     {
-        if ($this->commentaires->removeElement($commentaire)) {
+        if ($this->factures->removeElement($facture)) {
             // set the owning side to null (unless already changed)
-            if ($commentaire->getUser() === $this) {
-                $commentaire->setUser(null);
+            if ($facture->getUsers() === $this) {
+                $facture->setUsers(null);
             }
         }
 
         return $this;
     }
 
-    public function isVerified(): bool
-    {
-        return $this->isVerified;
-    }
+  
 
-    public function setIsVerified(bool $isVerified): self
-    {
-        $this->isVerified = $isVerified;
-
-        return $this;
-    }
-
-    public function getNom(): ?string
-    {
-        return $this->nom;
-    }
-
-    public function setNom(string $nom): self
-    {
-        $this->nom = $nom;
-
-        return $this;
-    }
 
   
 }
